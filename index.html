@@ -609,11 +609,11 @@ function switchTab(tab) {
 }
 
 // ═══════════════════════ GEMINI API ═══════════════════════
-const GEMINI_TEXT = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
-const GEMINI_VISION = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
+ const GEMINI_TEXT = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
+const GEMINI_VISION = GEMINI_TEXT;
 
 async function callGemini(prompt, imageParts) {
-  const key = getKey();
+  const key = getKey(); // make sure getKey() returns your API key
   if (!key) { 
     showSetup(); 
     throw new Error('no_key'); 
@@ -646,30 +646,24 @@ async function callGemini(prompt, imageParts) {
         ]
       })
     });
-  } catch (e) {
+  } catch(e) {
     throw new Error('🌐 Network error — check your internet connection.');
   }
 
   let data;
-  try { 
-    data = await res.json(); 
-  } catch (e) { 
-    throw new Error('⚠️ Server error — please try again.'); 
-  }
+  try { data = await res.json(); } catch(e) { throw new Error('⚠️ Server error — please try again.'); }
 
   if (!res.ok || data.error) {
     const code = data.error?.code || res.status;
     const msg = data.error?.message || '';
     if (code === 429 || msg.includes('quota') || msg.includes('exhausted')) 
-      throw new Error('⏳ Daily limit reached — get a new key at aistudio.google.com/apikey or wait till midnight IST.');
-    if (code === 400) throw new Error('🔑 Invalid API key — tap Key button, delete old key and paste new one.');
-    if (code === 403) throw new Error('🔑 API key not authorized — make sure you created it at aistudio.google.com/apikey');
+      throw new Error('⏳ Daily limit reached — get a new key or wait till midnight IST.');
+    if (code === 400) throw new Error('🔑 Invalid API key — check your key.');
+    if (code === 403) throw new Error('🔑 API key not authorized.');
     throw new Error('⚠️ ' + (msg || 'Unknown error — please try again.'));
   }
 
   return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
-}
-}
 
 // ═══════════════════════ WEATHER ═══════════════════════
 async function fetchWeather(locOverride) {
