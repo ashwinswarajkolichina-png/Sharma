@@ -611,14 +611,20 @@ function switchTab(tab) {
 // ═══════════════════════ GEMINI API ═══════════════════════
 const GEMINI_TEXT = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
 const GEMINI_VISION = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
+
 async function callGemini(prompt, imageParts) {
   const key = getKey();
-  if (!key) { showSetup(); throw new Error('no_key'); }
+  if (!key) { 
+    showSetup(); 
+    throw new Error('no_key'); 
+  }
 
+  // Combine image parts (if any) with text prompt
   const parts = [];
   if (imageParts) parts.push(...imageParts);
   parts.push({ text: prompt });
 
+  // Decide which endpoint to use
   const endpoint = imageParts && imageParts.length > 0 ? GEMINI_VISION : GEMINI_TEXT;
 
   let res;
@@ -633,19 +639,23 @@ async function callGemini(prompt, imageParts) {
         contents: [{ parts }],
         generationConfig: { maxOutputTokens: 1024, temperature: 0.7 },
         safetySettings: [
-          {category:"HARM_CATEGORY_HARASSMENT",threshold:"BLOCK_NONE"},
-          {category:"HARM_CATEGORY_HATE_SPEECH",threshold:"BLOCK_NONE"},
-          {category:"HARM_CATEGORY_SEXUALLY_EXPLICIT",threshold:"BLOCK_NONE"},
-          {category:"HARM_CATEGORY_DANGEROUS_CONTENT",threshold:"BLOCK_NONE"}
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
         ]
       })
     });
-  } catch(e) {
+  } catch (e) {
     throw new Error('🌐 Network error — check your internet connection.');
   }
 
   let data;
-  try { data = await res.json(); } catch(e) { throw new Error('⚠️ Server error — please try again.'); }
+  try { 
+    data = await res.json(); 
+  } catch (e) { 
+    throw new Error('⚠️ Server error — please try again.'); 
+  }
 
   if (!res.ok || data.error) {
     const code = data.error?.code || res.status;
@@ -656,7 +666,9 @@ async function callGemini(prompt, imageParts) {
     if (code === 403) throw new Error('🔑 API key not authorized — make sure you created it at aistudio.google.com/apikey');
     throw new Error('⚠️ ' + (msg || 'Unknown error — please try again.'));
   }
+
   return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
+}
 }
 
 // ═══════════════════════ WEATHER ═══════════════════════
