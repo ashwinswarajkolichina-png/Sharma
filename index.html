@@ -609,8 +609,8 @@ function switchTab(tab) {
 }
 
 // ═══════════════════════ GEMINI API ═══════════════════════
-const GEMINI_TEXT = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-002:generateContent';
-const GEMINI_VISION = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-002:generateContent';
+const GEMINI_TEXT = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
+const GEMINI_VISION = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
 async function callGemini(prompt, imageParts) {
   const key = getKey();
   if (!key) { showSetup(); throw new Error('no_key'); }
